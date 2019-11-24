@@ -39,3 +39,29 @@ func split_by_surface(orig_mi : MeshInstance,
 attachment_node : Node,
 use_local_space : bool = false):
 ```
+## Splitting by Grid
+Meshes that are large cannot be culled well, and will either by rendered in their entirety or not at all. Sometimes it is more efficient to split large meshes by their location. Splerger can do this automatically by applying a 3d grid, with a grid size specified for the x and z coordinates, and separately for the y coordinate (height).
+```
+func split(mesh_instance : MeshInstance,
+grid_size : float,
+grid_size_y : float,
+attachment_node : Node,
+use_local_space : bool = false,
+delete_orig : bool = true):
+```
+## Splitting many meshes by Grid
+You can also split multiple MeshInstance with one command:
+```
+func split_branch(node : Node,
+grid_size : float,
+grid_size_y : float = 0.0,
+use_local_space : bool = false):
+```
+This will search recursively and find all the MeshInstances in the scene graph that are children / grandchildren of 'node', and perform a split by grid on them.
+
+# Notes
+Although this script will perform splitting and merging, it is recommended that you apply this as a preprocess and save the resulting MeshInstances for use in game. See here:
+
+https://godotengine.org/qa/903/how-to-save-a-scene-at-run-time
+
+For an explanation of how to save nodes / branches as scenes.
