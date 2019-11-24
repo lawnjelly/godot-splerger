@@ -68,3 +68,5 @@ Although this script will perform splitting and merging, it is recommended that 
 https://godotengine.org/qa/903/how-to-save-a-scene-at-run-time
 
 For an explanation of how to save nodes / branches as scenes.
+
+When splitting by grid, the grid origin is the origin of the AABB bound in world space. The grid sizes are in world space. Note that split by grid does not split faces, and large faces than span more than one grid square will be assigned to only one grid square. There is also no duplication of faces, so the number of faces rendered when all the sub meshes are rendered is the same as the number in the original mesh.
