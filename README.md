@@ -63,7 +63,7 @@ use_local_space : bool = false):
 This will search recursively and find all the MeshInstances in the scene graph that are children / grandchildren of 'node', and perform a split by grid on them.
 
 # Notes
-Although this script will perform splitting and merging, it is recommended that you apply this as a preprocess and save the resulting MeshInstances for use in game. See here:
+Although this script will perform splitting and merging, because the process can be slow, it is recommended that you apply this as a preprocess and save the resulting MeshInstances for use in game. See here:
 
 https://godotengine.org/qa/903/how-to-save-a-scene-at-run-time
 
