@@ -35,6 +35,7 @@ e.g.
 	mergelist.push_back($Level/Level/Sponza_15_roof_60)
 	splerger.merge_meshinstances(mergelist, $Level)
 ```
+_Note only supports single surface meshes so far._
 ## Splitting by Surface
 If a MeshInstance contains more than one surface (material), you can split it into constituent meshes by surface.
 ```
@@ -52,6 +53,7 @@ grid_size_y : float,
 use_local_space : bool = false,
 delete_orig : bool = true):
 ```
+_Note only supports single surface meshes so far._
 ## Splitting many meshes by Grid
 You can also split multiple MeshInstance with one command:
 ```
