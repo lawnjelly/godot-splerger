@@ -46,9 +46,9 @@ use_local_space : bool = false):
 Meshes that are large cannot be culled well, and will either by rendered in their entirety or not at all. Sometimes it is more efficient to split large meshes by their location. Splerger can do this automatically by applying a 3d grid, with a grid size specified for the x and z coordinates, and separately for the y coordinate (height).
 ```
 func split(mesh_instance : MeshInstance,
+attachment_node : Node,
 grid_size : float,
 grid_size_y : float,
-attachment_node : Node,
 use_local_space : bool = false,
 delete_orig : bool = true):
 ```
@@ -56,6 +56,7 @@ delete_orig : bool = true):
 You can also split multiple MeshInstance with one command:
 ```
 func split_branch(node : Node,
+attachment_node : Node,
 grid_size : float,
 grid_size_y : float = 0.0,
 use_local_space : bool = false):
