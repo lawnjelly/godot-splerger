@@ -21,7 +21,7 @@ class _SplitInfo:
 var m_bDebug_Split = false
 
 
-func split_branch(node : Node, grid_size : float, grid_size_y : float = 0.0, use_local_space : bool = false):
+func split_branch(node : Node, attachment_node : Node, grid_size : float, grid_size_y : float = 0.0, use_local_space : bool = false):
 	var si : _SplitInfo = _SplitInfo.new()
 	si.grid_size = grid_size
 	si.grid_size_y = grid_size_y
@@ -39,7 +39,7 @@ func split_branch(node : Node, grid_size : float, grid_size_y : float = 0.0, use
 	for m in range (meshlist.size()):
 		print("mesh " + meshlist[m].get_name())
 		
-		if split(meshlist[m], grid_size, grid_size_y, node, use_local_space) == true:
+		if split(meshlist[m], attachment_node, grid_size, grid_size_y, use_local_space) == true:
 			splitlist[m] = true
 	
 	for m in range (meshlist.size()):
@@ -96,7 +96,7 @@ func _find_meshes_recursive(node : Node, meshlist, si : _SplitInfo):
 
 
 # split a mesh according to the grid size
-func split(mesh_instance : MeshInstance, grid_size : float, grid_size_y : float, attachment_node : Node, use_local_space : bool = false, delete_orig : bool = false):
+func split(mesh_instance : MeshInstance, attachment_node : Node, grid_size : float, grid_size_y : float, use_local_space : bool = false, delete_orig : bool = false):
 	
 	# save all the info we can into a class to avoid passing it around
 	var si : _SplitInfo = _SplitInfo.new()
