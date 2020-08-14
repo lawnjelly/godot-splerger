@@ -336,6 +336,8 @@ func _find_or_add_unique_vert(orig_index : int, unique_verts, ind_mapping):
 
 func split_by_surface(orig_mi : MeshInstance, attachment_node : Node, use_local_space : bool = false):
 
+	print ("split_by_surface " + orig_mi.get_name())
+
 	var mesh = orig_mi.mesh
 	
 	var count = mesh.get_surface_count()
@@ -357,6 +359,130 @@ func split_by_surface(orig_mi : MeshInstance, attachment_node : Node, use_local_
 	#orig_mi.queue_delete()
 	
 	pass
+
+func split_multi_surface_meshes_recursive(var node : Node):
+	if node is MeshInstance:
+		if node.get_child_count() == 0:
+			split_by_surface(node, node.get_parent())
+	
+	# iterate through children
+	for c in range (node.get_child_count()):
+		split_multi_surface_meshes_recursive(node.get_child(c))
+
+func merge_suitable_meshes_across_branches(var root : Spatial):
+	var master_list = []
+	_list_mesh_instances(root, master_list)
+	
+	var mat_list = []
+	var sub_list = []
+	
+	# identify materials
+	for n in range (master_list.size()):
+		var mat
+		if master_list[n].get_surface_material_count() > 0:
+			mat = master_list[n].mesh.surface_get_material(0)
+		
+		# is the material in the mat list already?
+		var mat_id = -1
+		
+		for m in range (mat_list.size()):
+			if mat_list[m] == mat:
+				mat_id = m
+				break
+
+		# first instance of material
+		if mat_id == -1:
+			mat_id = mat_list.size()
+			mat_list.push_back(mat)
+			sub_list.push_back([])
+
+		# mat id is the sub list to add to
+		var sl = sub_list[mat_id]
+		sl.push_back(master_list[n])
+		print("adding " + master_list[n].get_name() + " to material sublist " + str(mat_id))
+
+	# at this point the sub lists are complete, and we can start merging them
+	for n in range (sub_list.size()):
+		var sl = sub_list[n]
+		
+		if (sl.size() > 1):
+			var new_mi : MeshInstance = merge_meshinstances(sl, root)
+			
+			# compensate for local transform on the parent node
+			# (as the new verts will be in global space)
+			var tr : Transform = root.global_transform
+			tr = tr.inverse()
+			new_mi.transform = tr
+	
+
+
+func _list_mesh_instances(var node, var list):
+	if node is MeshInstance:
+		if node.get_child_count() == 0:
+			var mi : MeshInstance = node
+			if mi.get_surface_material_count() <= 1:
+				list.push_back(node)
+		
+	for c in range (node.get_child_count()):
+		_list_mesh_instances(node.get_child(c), list)
+		
+
+
+func merge_suitable_meshes_recursive(var node : Node):
+	# try merging child mesh instances
+	_merge_suitable_child_meshes(node)
+	
+	# iterate through children
+	for c in range (node.get_child_count()):
+		merge_suitable_meshes_recursive(node.get_child(c))
+	
+
+func _merge_suitable_child_meshes(var node : Node):
+	if node is Spatial:
+		var spat : Spatial = node
+	
+		var child_list = []
+		for c in range (node.get_child_count()):
+			_find_suitable_meshes(child_list, node.get_child(c))
+			
+		if (child_list.size() > 1):
+			var new_mi : MeshInstance = merge_meshinstances(child_list, node)
+			
+			# compensate for local transform on the parent node
+			# (as the new verts will be in global space)
+			var tr : Transform = spat.global_transform
+			tr = tr.inverse()
+			new_mi.transform = tr
+		
+	
+
+func _find_suitable_meshes(var child_list, var node : Node):
+	# don't want to merge meshes with children
+	if node.get_child_count():
+		return
+	
+	if node is MeshInstance:
+		var mi : MeshInstance = node
+		# must have only one surface
+		if mi.get_surface_material_count() <= 1:
+			print("found mesh instance " + mi.get_name())
+	
+			var mat_this = mi.mesh.surface_get_material(0)
+	
+			if (child_list.size() == 0):
+				if (mat_this):
+					print("\tadding first to list")
+					child_list.push_back(mi)
+				return
+	
+			# already exists in child list
+			# must be compatible meshes
+			var mat_existing = child_list[0].mesh.surface_get_material(0)
+	
+			if (mat_this == mat_existing):
+				print("\tadding to list")
+				child_list.push_back(mi)
+	
 
 func merge_meshinstances(var mesh_array, var attachment_node : Node, var use_local_space : bool = false, var delete_originals : bool = true):
 	if mesh_array.size() < 2:
@@ -407,6 +533,9 @@ func merge_meshinstances(var mesh_array, var attachment_node : Node, var use_loc
 			if parent:
 				parent.remove_child(mi)
 			mi.queue_free()
+			
+	# return the new mesh instance as it can be useful to change transform
+	return new_mi
 		
 
 func _merge_meshinstance(st : SurfaceTool, mi : MeshInstance, var use_local_space : bool, var vertex_count : int):
@@ -523,8 +652,9 @@ func _split_mesh_by_surface(mdt : MeshDataTool, orig_mi : MeshInstance, attachme
 		new_mi.transform = orig_mi.transform
 	
 	var sz = orig_mi.get_name() + "_" + str(surf_id)
-	if mat.resource_name != "":
-		sz += "_" + mat.resource_name
+	if mat:
+		if mat.resource_name != "":
+			sz += "_" + mat.resource_name
 	new_mi.set_name(sz)
 	
 	# add the new mesh as a child
