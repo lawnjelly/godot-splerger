@@ -65,6 +65,23 @@ use_local_space : bool = false):
 ```
 This will search recursively and find all the MeshInstances in the scene graph that are children / grandchildren of 'node', and perform a split by grid on them.
 
+# Whole scene functions
+## Recursive find and split meshes with multi-surfaces
+This will search recursively and each mesh with more than 1 surface it will call `split_by_surface`, attaching the new meshes to the parent of the split mesh.
+```
+func split_multi_surface_meshes_recursive(var node : Node):
+```
+
+## Recursive find mesh siblings with matching materials and merge them
+```
+func merge_suitable_meshes_recursive(var node : Node):
+```
+
+## Recursive find meshes with matching materials and merge (even in different branches)
+```
+func merge_suitable_meshes_across_branches(var root : Spatial):
+```
+
 # Notes
 Although this script will perform splitting and merging, because the process can be slow, it is recommended that you apply this as a preprocess and save the resulting MeshInstances for use in game. See here:
 
