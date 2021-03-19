@@ -53,6 +53,8 @@ grid_size_y : float,
 use_local_space : bool = false,
 delete_orig : bool = true):
 ```
+For instance, on the x axis, if using world space (`use_local_space` set to false), if the AABB of the object is 10 units, and you set the grid size to 1.0, it will attempt approx 10 splits on that axis. If it reports not enough splits, then the grid_size is too large to split the AABB of the object.
+
 _Note only supports single surface meshes so far._
 ## Splitting many meshes by Grid
 You can also split multiple MeshInstance with one command:
