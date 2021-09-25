@@ -7,6 +7,7 @@ class_name Splerger
 # split_branch
 # split
 # split_by_surface
+# save_scene
 
 class _SplitInfo:
 	var grid_size : float = 0
@@ -19,7 +20,6 @@ class _SplitInfo:
 
 # debug
 var m_bDebug_Split = false
-
 
 func split_branch(node : Node, attachment_node : Node, grid_size : float, grid_size_y : float = 0.0, use_local_space : bool = false):
 	var si : _SplitInfo = _SplitInfo.new()
@@ -691,3 +691,19 @@ func _calc_aabb(mesh_instance : MeshInstance):
 #			aabb = aabb.expand(vert)
 #
 #	_check_aabb(aabb)
+
+func _set_owner_recursive(node, owner):
+	if (node != owner):
+		node.set_owner(owner)
+		
+	for i in range (node.get_child_count()):
+		_set_owner_recursive(node.get_child(i), owner)
+		
+func save_scene(node, filename):
+	var owner = node.get_owner()
+	_set_owner_recursive(node, node)
+	
+	var packed_scene = PackedScene.new()
+	packed_scene.pack(node)
+	ResourceSaver.save(filename, packed_scene)
+
