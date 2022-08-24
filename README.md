@@ -1,5 +1,5 @@
 # godot-splerger
-Mesh splitting and merging script for Godot 3.2
+Mesh splitting and merging script for Godot 4.0 (Alpha 14)
 
 ## Installation
 Either install as an addon, or simply copy splerger.gd to your project, and it should be available to use.
